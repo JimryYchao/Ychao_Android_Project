@@ -1,3 +1,4 @@
 rootProject.name = "Ychao_Android"
 include ':app'
 include ':PerformanceAnalysis'
+include ':NativeGallery'
