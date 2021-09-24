@@ -13,6 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+// Default: double -1
+//          long
+
 public class MemorySampler {
 
     private static MemorySampler instance;
@@ -44,10 +47,10 @@ public class MemorySampler {
             Log.e(TAG, "getCpuProcessorMaxFreq: Failed");
             return "NaN";
         }
-    }
+    } // KB
 
     /**
-     * Total,Free,Buffers,Cached (B)
+     * Total,Free,Buffers,Cached (KB)
      */
     public long[] getSampleMemInfo() {
         long MemTotal = 0;
@@ -95,7 +98,7 @@ public class MemorySampler {
         } finally {
             return new long[]{MemTotal, MemFree, Buffers, Cached};
         }
-    }
+    } // KB
 
     public long getAvailableMemSize(Context context) {
         ActivityManager.MemoryInfo outInfo = new ActivityManager.MemoryInfo();
@@ -126,7 +129,7 @@ public class MemorySampler {
         } catch (IOException e) {
             Log.e(TAG, "IOException: " + e.getMessage());
         }
-        return memory;
+        return memory;  //KB
     }
 
     /**
@@ -171,7 +174,7 @@ public class MemorySampler {
     }
 
     /**
-     * 获取Runtime 本地堆分配, Native_heapSize, Native_heapAlloc, Native_headFree, 分析可能存在的内存泄露问题
+     * 获取Runtime 本地堆分配, Native_heapSize, Native_heapAlloc, Native_headFree, 分析可能存在的内存泄露问题 (KB)
      */
     public long[] getNativeHeap(){
         int Native_HeapSize = 0;
@@ -185,7 +188,7 @@ public class MemorySampler {
     }
 
     /**
-     * 获取 Runtime 虚拟机堆分配数据, Dalvik_HeapSize, Dalvik_HeapAlloc
+     * 获取 Runtime 虚拟机堆分配数据, Dalvik_HeapSize, Dalvik_HeapAlloc (KB)
      */
     public long[] getDalvikHeap(){
         int Total_HeapSize = 0;
@@ -209,21 +212,21 @@ public class MemorySampler {
         return value_dalvik;
     }
 
-    public double getProcessMemUsageByTop(int pid){
+    public String getProcessMemUsageByTop(int pid){
 
         String CallStr = ProcessInfoSampler.getProcessTopInfo(pid);
 
         if (CallStr == null || CallStr == "") {
-            return -1;
+            return null;
         }
         String[] pidtopInfo = CallStr.split("\\s+");
 
         if (pid == Integer.parseInt(pidtopInfo[0])) {
-            double rate = Double.parseDouble(pidtopInfo[9]);
+            String rate = pidtopInfo[9];
             return rate;
         } else {
             Log.d(TAG, "getProcessCoreUsage: not get PidCpu Usage by this Pid: " + pid);
-            return -1;
+            return null;
         }
     }
 
@@ -239,5 +242,12 @@ public class MemorySampler {
             return "NaN";
         }
     }
+
+    public long getProcessTotalPSS(Context context, int pid){
+        long[] value = getPSSInfo(context, pid);
+        long totalPSS = value[2];
+
+        return totalPSS; // KB
+    }// KB
 
 }

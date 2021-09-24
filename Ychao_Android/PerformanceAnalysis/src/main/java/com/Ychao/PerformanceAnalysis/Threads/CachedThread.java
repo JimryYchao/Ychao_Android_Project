@@ -4,15 +4,19 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SingleThread extends ThreadPoolBase {
+public class CachedThread extends ThreadPoolBase{
 
-    public SingleThread(){
-        super(Executors.newSingleThreadExecutor());
+    public CachedThread() {
+        super(Executors.newCachedThreadPool());
     }
 
-    public void exec(Runnable task){
-
+    public void exec(Runnable task) {
+        if (task != null)
+            executor.execute(task);
     }
+
+    private List<Runnable> tasks;
+
     public void exec(List<Runnable> tasks) {
         tasks.clear();
 
@@ -33,11 +37,9 @@ public class SingleThread extends ThreadPoolBase {
     }
 
 
-    private List<Runnable> tasks;
     private void addTask(Runnable task) {
         if (task != null && !tasks.contains(task)) {
             tasks.add(task);
         }
     }
-
 }
